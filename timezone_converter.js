@@ -29,6 +29,15 @@ const timezones = [
   "NPT (Nepal Time)",
 ];
 
+
+//validating input time entered by user
+const validateTime = (time) => {
+  //regular expression which checks whether time is in format of 'HH:MM AM/PM'
+  const regex = /^(1[012]|[1-9]):[0-5][0-9](\s)(am|pm)$/i;
+  const result = regex.test(time);
+  return result;
+};
+
 //taking input for current_timezone
 await inquirer
   .prompt([
@@ -39,8 +48,8 @@ await inquirer
       choices: timezones,
     },
   ])
-  .then((answers) => {
-    CURRENT_TIMEZONE = answers.current_timezone.split(' ')[0];;
+  .then((answer) => {
+    CURRENT_TIMEZONE = answer.current_timezone.split(' ')[0];;
   })
   .catch((error) => {
     console.error(error);
@@ -57,9 +66,8 @@ await inquirer
       choices: timezones,
     },
   ])
-  .then((answers) => {
-    CONVERT_TO_TIMEZONE = answers.convert_to_timezone.split(' ')[0];
-    console.log(CONVERT_TO_TIMEZONE)
+  .then((answer) => {
+    CONVERT_TO_TIMEZONE = answer.convert_to_timezone.split(' ')[0];
   })
   .catch((error) => {
     console.error(error);
@@ -72,15 +80,20 @@ await inquirer
     {
       type: "input",
       name: "current_time",
-      message: "What is the time?",
+      message: `Enter time in format of 'HH:MM AM/PM' :`,
       default: "12:00 AM"
     },
   ])
-  .then((answers) => {
-    CURRENT_TIME = answers.current_time;
+  .then((answer) => {
+    CURRENT_TIME = answer.current_time;
+
+    if (!validateTime(CURRENT_TIME)) {
+      throw new Error(`Please enter correct time in format of 'HH:MM AM/PM'`);
+    }
   })
   .catch((error) => {
-    console.error(error);
+    console.error(error.message);
+    process.exit();
   });
 
 
